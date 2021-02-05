@@ -42,11 +42,18 @@ const error = require('./error')
 const getObjKeyPair = require('./getObjKeyPair')
 const CoreObject = require('../core/CoreObject')
 
+function disallowProtoPath (attr, key) {
+  if (attr === Object.prototype) {
+    throw new Error('Unsafe path encountered: ' + key)
+  }
+}
+
 function set (obj, key, val, quiet, skipCompare) {
   let meta
   if (typeof key === 'string') {
     if (key.indexOf('.') > -1) {
       obj = getObjKeyPair(obj, key, true)
+      disallowProtoPath(obj[0], key)
       key = obj[1]
       obj = obj[0]
     }
